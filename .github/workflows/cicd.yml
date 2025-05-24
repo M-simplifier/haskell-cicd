@@ -38,7 +38,7 @@ jobs:
                 docker push asia-northeast2-docker.pkg.dev/${{ secrets.PROJECT_ID }}/cicd-test1/haskell-cicd-image:${{ env.TAG }}
             - name: Deploy
               run: |
-                gcloud run deploy fastapi-cicd-image \
+                gcloud run deploy haskell-cicd-image \
                   --project ${{ secrets.PROJECT_ID }} \
                   --image asia-northeast2-docker.pkg.dev/${{ secrets.PROJECT_ID }}/cicd-test1/haskell-cicd-image:${{ env.TAG }} \
                   --region asia-northeast2 \
