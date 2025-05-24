@@ -1,13 +1,22 @@
 # ---- builder ----
 FROM haskell:9.4.8 AS builder
 WORKDIR /src
-COPY *.cabal /src/
-RUN cabal update
+
+# 依存だけ先に解決してキャッシュを効かせる
+COPY *.cabal cabal.project* /src/
+RUN cabal update && cabal build --only-dependencies
+
+# ソース投入 & ビルド + インストール
 COPY . /src
-RUN cabal build --enable-executable-static -O2 all
+RUN cabal install \
+      --installdir=/opt/bin \
+      --install-method=copy \
+      --overwrite-policy=always \
+      --enable-executable-static \
+      -O2
 
 # ---- runtime ----
 FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y libgmp10
-COPY --from=builder /src/dist-newstyle/build/x86_64-linux/ghc-9.4.8/haskell-cicd-0.1.0.0/x/haskell-cicd/build/haskell-cicd/haskell-cicd /usr/local/bin/haskell-cicd
+RUN apt-get update && apt-get install -y libgmp10 && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /opt/bin/haskell-cicd /usr/local/bin/haskell-cicd
 CMD ["/usr/local/bin/haskell-cicd"]
