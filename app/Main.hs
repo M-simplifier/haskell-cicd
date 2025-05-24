@@ -12,7 +12,7 @@ app _ respond = do
     responseLBS
       status200
       [("Content-Type", "text/plain")]
-      "Hello, Web!"
+      "Hello, Web! version 2!"
 
 main :: IO ()
 main = do
